@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <style>
+    body {
+      background-color: yellowgreen;
+    }
+
+    .container {
+      min-width: 960px;
+      max-width: 1080px;
+      margin: 20px auto;
+    }
+
+    .head, cell {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .head ul, .card-wrap {
+      display: flex;
+      width: 450px;
+      justify-content: space-between;
+    }
+
+    .head li {
+      width: 105px;
+      height: 150px;
+      border: 1px solid #fff;
+    }
+
+    .cell {
+      display: flex;
+      min-height: 300px;
+      justify-content: space-between;
+    }
+
+    .card-wrap {
+      display: block;
+      /*background-color: rgba(0, 0, 0, .3);*/
+      width: 120px;
+    }
+
+    .card {
+      width: 105px;
+      height: 150px;
+      border-radius: 5px;
+      background-size: 105px 150px;
+      background-repeat: no-repeat;
+      /*background-image: url(img/tao/tao_2.jpg);*/
+      margin: 0 auto -120px;
+    }
+
+  </style>
+</head>
+<body>
+<div class="head container">
+  <ul class="cache">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+  <ul class="wrap">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+</div>
+<div class="cell container">
+  <div class="card-wrap"></div>
+  <div class="card-wrap"></div>
+  <div class="card-wrap"></div>
+  <div class="card-wrap"></div>
+  <div class="card-wrap"></div>
+  <div class="card-wrap"></div>
+  <div class="card-wrap"></div>
+  <div class="card-wrap"></div>
+</div>
+<button class="btn">点击</button>
+<script type="text/javascript" src="js/start.js"></script>
+<script type="text/javascript">
+  var cardWraps = document.querySelectorAll('.card-wrap')
+  var btn = document.querySelector('.btn')
+  window.init(cardWraps)
+  btn.onclick = function () {
+    init(cardWraps)
+  }
+</script>
+</body>
+</html>
