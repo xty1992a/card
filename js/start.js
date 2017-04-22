@@ -31,9 +31,13 @@
     console.log(bigArr)
     for (var i = 0; i < wraps.length; i++) {
       let fragment = document.createDocumentFragment()
+      var table = document.createElement('div')
+          table.setAttribute('class', 'table')
+          // fragment.appendChild(table)
       for (var j = 0; j < bigArr[i].length; j++) {
         var card = document.createElement('div')
         card.setAttribute('class', 'card')
+        card.setAttribute('draggable', 'true')
         card.style.backgroundImage = 'url(' + urlList[bigArr[i][j]] + ')'
         fragment.appendChild(card)
       }
