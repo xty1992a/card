@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>transporter</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <style>
+    body {
+      background-color: yellowgreen;
+    }
+
+    .container {
+      min-width: 960px;
+      max-width: 1080px;
+      margin: 20px auto;
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .head ul, .card-wrap {
+      display: flex;
+      width: 450px;
+      justify-content: space-between;
+    }
+
+    .head li {
+      width: 105px;
+      height: 150px;
+      border: 1px solid #fff;
+    }
+
+    .cell {
+      display: flex;
+      position: relative;
+      min-height: 300px;
+      justify-content: space-between;
+    }
+
+    .transporter{
+      position: absolute;
+      top: 0;
+      left: 0;
+      /*width: 120px;*/
+    }
+    .card-wrap {
+      display: block;
+      position: relative;
+      width: 120px;
+    }
+    .table{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      z-index: -1;
+      background-color: rgba(0, 0, 0, .3);
+    }
+    .card {
+      width: 105px;
+      height: 150px;
+      border-radius: 5px;
+      background-size: 105px 150px;
+      background-repeat: no-repeat;
+      margin: 0 auto -120px;
+    }
+
+    .box{
+      height: 100px;
+      width: 100px;
+      background-color: #fff;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .finished-wrap li{
+      position: relative;
+    }
+    .finished-wrap .card{
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="head container">
+  <ul class="cache">
+    <li class="cache-wrap"></li>
+    <li class="cache-wrap"></li>
+    <li class="cache-wrap"></li>
+    <li class="cache-wrap"></li>
+  </ul>
+  <ul class="finished-wrap">
+    <li id="fang"></li>
+    <li id="tao"></li>
+    <li id="xin"></li>
+    <li id="hua"></li>
+  </ul>
+</div>
+<div class="cell container"></div>
+<button class="btn">点击</button>
+<script type="text/javascript" src="js/secend.js"></script>
+<script type="text/javascript">
+  var cell = document.querySelector('.cell')
+  var finishedWrap = document.querySelector('.finished-wrap')
+  var box = document.querySelector('.box')
+  var cacheWraps = document.querySelectorAll('.cache-wrap')
+  var btn = document.querySelector('.btn')
+
+  var fang = document.getElementById('fang')
+  var tao = document.getElementById('tao')
+  var xin = document.getElementById('xin')
+  var hua = document.getElementById('hua')
+
+  init(cell)
+  var backList = []
+
+  var cardWraps = document.querySelectorAll('.card-wrap')
+
+  dragMove()
+
+
+  btn.onclick = function () {
+    for (var i = 0; i < cacheWraps.length; i++) {
+      clear(cacheWraps[i])
+      clear(finishedWrap.children[i])
+    }
+    init(cell)
+  }
+
+  // 检查
+  function check(wrap) {
+    if(wrap.children.length===0){
+      return
+    }
+    var wrapChildren = [].slice.call(wrap.children)
+    var len = wrapChildren.length
+    var lastCard = wrapChildren[len-1]
+    var color = lastCard.cardInfo.color
+    var index = lastCard.cardInfo.index
+    var targetWrap = document.getElementById(color)
+    if (targetWrap.children.length===0){ // 如果完成区尚空
+      if (index===1){ // 且检查到有A在队尾
+        console.log('push a');
+        unLoadCard(targetWrap, [lastCard])
+//        targetWrap.appendChild(lastCard)
+//        wrap.removeChild(wrap.lastElementChild)
+      }
+    } else {// 完成区不空
+      var normCard = targetWrap.lastElementChild // 取得完成区的最后一张牌
+      if (index-1===normCard.cardInfo.index){ // 如果完成区的下一张牌在队尾
+        unLoadCard(targetWrap, [lastCard])
+//        targetWrap.appendChild(lastCard)
+//        wrap.removeChild(wrap.lastElementChild)
+      }
+    }
+  }
+
+
+  function checkAll() {
+    console.log('i m working')
+    for (var i = 0; i < cardWraps.length; i++) {
+      check(cardWraps[i])
+    }
+    for (var j = 0; j < cacheWraps.length; j++) {
+      check(cacheWraps[j])
+    }
+  }
+
+  function dragMove() {
+    var cell = document.querySelector('.cell')
+    document.onmousedown = function (ev) {
+      ev.preventDefault()
+      var target = ev.target
+      var unLoad = false
+      var mouseS = {
+        top: ev.clientY,
+        left: ev.clientX,
+        x: ev.offsetX,
+        y: ev.offsetY
+      }
+
+
+
+      var father = target.parentNode
+      // 完整子元素数组
+      var children = [].slice.call(father.children)
+      // 被点击元素索引
+      var cardIndex = children.indexOf(target)
+      // 被点击元素之上所有牌
+      var sblings = children.slice(0,cardIndex)
+      // 获取被点击元素之下的所有牌
+      var bros = children.slice(cardIndex)
+
+      // 若目标为card且之下的兄弟成列
+      if (target.getAttribute('class')!=='card'&& !isSbling(bros)) {
+        return
+      }
+      var transporter = document.createElement('div')
+      
+      transporter.setAttribute('class', 'transporter')
+      transporter.style.top = mouseS.top- mouseS.y + 'px'
+      transporter.style.left = mouseS.left- mouseS.x + 'px'
+
+      father.innerHTML = ''
+      for (var i = 0; i < sblings.length; i++) {
+        father.appendChild(sblings[i])
+      }
+      for (var j = 0; j < bros.length; j++) {
+        transporter.appendChild(bros[j])
+      }
+      document.body.appendChild(transporter)
+
+      document.onmousemove = function (ev) {
+        var mouseN = {
+          top: ev.clientY,
+          left: ev.clientX
+        }
+        transporter.style.top = mouseN.top - mouseS.y + 'px'
+        transporter.style.left = mouseN.left - mouseS.x + 'px'
+      }
+
+      document.onmouseover = function (event) {
+        if (!unLoad){
+          return
+        }
+        unLoad = false
+        var load = event.target
+        var passenger = [].slice.call(transporter.children)
+
+        if (load.getAttribute('class')==='card'){ // 着陆区为card
+          var loader = load.parentNode
+          var lastCard = loader.children[loader.children.length-1].cardInfo
+          var firstCard = passenger[0].cardInfo
+          if(lastCard.horde!==firstCard.horde&&lastCard.index===firstCard.index+1){
+            unLoadCard(loader, passenger)
+            transporter && transporter.parentNode.removeChild(transporter)
+          }else {
+            // 离子归家
+            unLoadCard(father, children)
+            transporter && transporter.parentNode.removeChild(transporter)
+            console.log('shoul check');
+          }
+        }else if (load.children.length===0 &&
+          load.getAttribute('class')==='cache-wrap'&&
+          passenger.length === 1) {// 着陆区为缓存区卡位
+          console.log('cache');
+          unLoadCard(load, passenger)
+          transporter && transporter.parentNode.removeChild(transporter)
+        } else if(load.children.length===0 &&
+          load.getAttribute('class')==='card-wrap'){
+          unLoadCard(load, passenger)
+          transporter && transporter.parentNode.removeChild(transporter)
+        } else {
+          unLoadCard(father, children)
+          transporter && transporter.parentNode.removeChild(transporter)
+        }
+
+      }
+
+      document.onmouseup = function (event) {
+
+
+        transporter.style.display = 'none'
+        document.onmousemove = document.onmouseup = null
+        unLoad = true
+      }
+    }
+  }
+
+  function unLoadCard(loader, passenger) {
+    if (!Array.isArray(passenger)&&!loader.nodeType){
+      console.error('load error not a node/not a Array')
+      return
+    }
+    var fragment = document.createDocumentFragment()
+    passenger.forEach(child => {
+      fragment.appendChild(child)
+    })
+    loader.appendChild(fragment)
+    console.log('should check')
+    checkAll()
+  }
+  
+  // 判断传入的元素数组是否成系列(花色交替且数字递减)
+  function isSbling(list) {
+    if (!list[0].cardInfo){
+      return
+    }
+    var flag = true
+    for (var i = 0; i < list.length; i++) {
+      if(i+1===list.length){
+        break
+      }
+      if(list[i].cardInfo.index!==list[i+1].cardInfo.index+1||
+        list[i].cardInfo.horde===list[i+1].cardInfo.horde){
+        flag = false
+        break
+      }
+    }
+    return flag
+  }
+
+  function clear(wrap) {
+    wrap.innerHTML = ''
+  }
+
+</script>
+</body>
+</html>

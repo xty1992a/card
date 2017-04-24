@@ -102,14 +102,6 @@
   <div class="card-wrap">
     <div class="table"></div>
   </div>
-  <!--<div class="card-wrap"></div>-->
-  <!--<div class="card-wrap"></div>-->
-  <!--<div class="card-wrap"></div>-->
-  <!--<div class="card-wrap"></div>-->
-  <!--<div class="card-wrap"></div>-->
-  <!--<div class="card-wrap"></div>-->
-  <!--<div class="card-wrap"></div>-->
-  <!--<div class="card-wrap"></div>-->
 </div>
 <button class="btn">点击</button>
 <script type="text/javascript" src="js/start.js"></script>
@@ -136,13 +128,34 @@
 
     document.ondrop = function(ev){
       console.log(ev.target.getAttribute('class'))
-      if (ev.target.getAttribute('class')==='card-wrap') {
+      // 获取目标元素
+      var target = ev.target
+      var loader = null
+      if(target.getAttribute('class')==='card-wrap'){
+        loader = target
+      }else if (target.getAttribute('class')==='card'){
+        loader = target.parentNode
+      }
+      // 获取最底下的牌的信息
+      var lastCard = loader.children[loader.children.length-1].cardInfo
+
+      console.log(lastCard, dragDom.cardInfo);
+      if(lastCard.horde!==dragDom.cardInfo.horde&&lastCard.index>dragDom.cardInfo.index){
+        /*console.log(lastCard.horde, lastCard.index,'last');
+        console.log(dragDom.cardInfo.horde,dragDom.cardInfo.index ,'now');*/
+        var clone = dragDom.cloneNode(true)
+        // clone不完善,不能完整复制dom中自定义属性
+        clone.cardInfo = dragDom.cardInfo
+        loader.appendChild(clone)
+        dragDom.parentNode.removeChild(dragDom)
+      }
+     /* if (ev.target.getAttribute('class')==='card-wrap') {
         dragDom.parentNode.removeChild(dragDom)
         ev.target.appendChild(dragDom.cloneNode(true));
       } else if(ev.target.getAttribute('class')==='card') {
-        dragDom.parentNode.removeChild(dragDom)
         ev.target.parentNode.appendChild(dragDom.cloneNode(true));
-      }
+        dragDom.parentNode.removeChild(dragDom)
+      }*/
     }
   }
 
@@ -154,6 +167,7 @@
       var father = dom.parentNode
       var lastNode = father.children[father.children.length-1]
       if(lastNode === dom&&dom.getAttribute('class')==='card') {
+        console.log(ev.target.cardInfo);
         dragDom = ev.target
       }
     };

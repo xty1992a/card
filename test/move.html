@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    .box{
+      height: 100px;
+      width: 100px;
+      background-color: yellowgreen;
+      position: absolute;
+      top: 100px;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="box"></div>
+
+<script type="text/javascript">
+  var box = document.querySelector('.box')
+
+  document.onmousedown = function (ev) {
+    var mouseS = {
+      left: ev.clientX,
+      top: ev.clientY
+    }
+    var ele = {
+      x: ev.offsetX,
+      y: ev.offsetY
+    }
+    document.onmousemove = function (ev) {
+      var mouseN = {
+        left: ev.clientX,
+        top: ev.clientY
+      }
+      var tagart = {
+        top: mouseN.top-ele.y,
+        left: mouseN.left-ele.x,
+      }
+      box.style.top = tagart.top + 'px'
+      box.style.left = tagart.left + 'px'
+    }
+    document.onmouseup = function () {
+      document.onmousemove = document.onmouseup = null
+    }
+  }
+
+</script>
+</body>
+</html>

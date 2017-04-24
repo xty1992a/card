@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>transporter</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <style>
+    body {
+      background-color: yellowgreen;
+      position: relative;
+    }
+
+    .container {
+      min-width: 960px;
+      max-width: 1080px;
+      margin: 20px auto;
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .head ul, .card-wrap {
+      display: flex;
+      width: 450px;
+      justify-content: space-between;
+    }
+
+    .head li {
+      width: 105px;
+      height: 150px;
+      border: 1px solid #fff;
+    }
+
+    .cell {
+      display: flex;
+      position: relative;
+      min-height: 300px;
+      justify-content: space-between;
+    }
+
+    .transporter{
+      position: absolute;
+      width: 120px;
+      margin-top: -6px;
+    }
+    .card-wrap {
+      display: block;
+      position: relative;
+      width: 120px;
+    }
+    .table{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      z-index: -1;
+      background-color: rgba(0, 0, 0, .3);
+    }
+    .card {
+      width: 105px;
+      height: 150px;
+      border-radius: 5px;
+      background-size: 105px 150px;
+      background-repeat: no-repeat;
+      margin: 0 auto -120px;
+    }
+
+  </style>
+</head>
+<body>
+<div class="head container">
+  <ul class="cache">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+  <ul class="wrap">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+</div>
+<div class="cell container">
+  <div class="card-wrap">
+  </div>
+  <div class="card-wrap">
+  </div>
+  <div class="card-wrap">
+  </div>
+  <div class="card-wrap">
+  </div>
+  <div class="card-wrap">
+  </div>
+  <div class="card-wrap">
+  </div>
+  <div class="card-wrap">
+  </div>
+  <div class="card-wrap">
+  </div>
+</div>
+<button class="btn">点击</button>
+<script type="text/javascript" src="js/start.js"></script>
+<script type="text/javascript">
+  var cardWraps = document.querySelectorAll('.card-wrap')
+  var tables = document.querySelectorAll('.table')
+  var btn = document.querySelector('.btn')
+  window.init(cardWraps)
+  var dragDom = null
+//  drag()
+//  initDrag()
+
+  btn.onclick = function () {
+    init(cardWraps)
+  }
+
+
+  dragMove()
+  function dragMove() {
+    var cell = document.querySelector('.cell')
+    document.onmousedown = function (ev) {
+      ev.preventDefault()
+      var target = ev.target
+      var unLoad = false
+      var father = null
+//      console.log(ev);
+
+      if (target.getAttribute('class')==='card'){
+        var offset = -10
+        father = target.parentNode
+        // 完整子元素数组
+        var children = [].slice.call(father.children)
+        // 被点击元素索引
+        var cardIndex = children.indexOf(target)
+        // 被点击元素之上所有牌
+        var sblings = children.slice(0,cardIndex)
+        // 获取被点击元素之下的所有牌
+        var bros = children.slice(cardIndex)
+        var offsetP = {
+          x: ev.offsetX,
+          y: ev.offsetY,
+          top: target.getBoundingClientRect().top,
+          left: target.getBoundingClientRect().left,
+        }
+        var startP = {
+          x: ev.clientX,
+          y: ev.clientY
+        }
+        if (isSbling(bros)){
+          var transporter = document.createElement('div')
+          transporter.setAttribute('class', 'transporter')
+
+          transporter.style.top = offsetP.top + startP.y +offset+0 + 'px'
+          transporter.style.left = offsetP.top + startP.x +offset + 'px'
+          
+          father.innerHTML = ''
+          for (var i = 0; i < sblings.length; i++) {
+            father.appendChild(sblings[i])
+          }
+          for (var j = 0; j < bros.length; j++) {
+            transporter.appendChild(bros[j])
+          }
+          document.body.appendChild(transporter)
+        }
+        document.onmousemove = function (ev) {
+          var currentP = {
+            x: ev.clientX,
+            y: ev.clientY
+          }
+          var targetY = offsetP.top + (currentP.y-startP.y) +offset+0
+          var targetX = offsetP.left + (currentP.x-startP.x) +offset
+
+          transporter.style.top = targetY + 'px'
+          transporter.style.left = targetX + 'px'
+        }
+
+        document.onmouseover = function (event) {
+          if (!unLoad) {
+            return
+          }
+          console.log('over');
+          var load = event.target
+          var passenger = [].slice.call(transporter.children)
+
+          // 着陆区为card
+          if (load.getAttribute('class')==='card') {
+            var loader = load.parentNode
+            var lastCard = loader.children[loader.children.length-1].cardInfo
+            var firstCard = passenger[0].cardInfo
+            // 着陆区符合运输者系列
+            if(lastCard.horde!==firstCard.horde&&lastCard.index===firstCard.index+1){
+              console.log('get in');
+              for (var i = 0; i < passenger.length; i++) {
+                loader.appendChild(passenger[i])
+              }
+              transporter && transporter.parentNode.removeChild(transporter)
+              document.onmouseover = null
+              return
+            }
+            // 着陆区不符合系列, 放回原位
+            for (var i = 0,len = passenger.length; i < len; i++) {
+              father.appendChild(passenger[i])
+            }
+          }
+          // 着陆区不是card 将卡片放回原位
+          for (var i = 0; i < passenger.length; i++) {
+            father.appendChild(passenger[i])
+          }
+          transporter && transporter.parentNode.removeChild(transporter)
+          document.onmouseover = null
+          unLoad = false
+        }
+
+        document.onmouseup = function (event) {
+          transporter.style.display = 'none'
+          document.onmousemove = document.onmouseup = null
+          unLoad = true
+        }
+      }
+    }
+  }
+
+  function move() {
+
+  }
+  
+  
+  // 判断传入的元素数组是否成系列(花色交替且数字递减)
+  function isSbling(list) {
+    if (!list[0].cardInfo){
+      return
+    }
+    var flag = true
+    for (var i = 0; i < list.length; i++) {
+      if(i+1===list.length){
+        break
+      }
+      if(list[i].cardInfo.index!==list[i+1].cardInfo.index+1||
+        list[i].cardInfo.horde===list[i+1].cardInfo.horde){
+        flag = false
+        break
+      }
+    }
+    return flag
+  }
+
+
+
+
+
+//  function initDrag() {
+//    document.ondragover = function(ev){
+//      if (ev.target.getAttribute('class')==='card'||
+//          ev.target.getAttribute('class')==='card-wrap'){
+//        ev.preventDefault()
+//      }
+//    }
+//
+//    document.ondrop = function(ev){
+//      console.log(ev.target.getAttribute('class'))
+//      // 获取目标元素
+//      var target = ev.target
+//      var loader = null
+//      if(target.getAttribute('class')==='card-wrap'){
+//        loader = target
+//      }else if (target.getAttribute('class')==='card'){
+//        loader = target.parentNode
+//      }
+//      // 获取最底下的牌的信息
+//      var lastCard = loader.children[loader.children.length-1].cardInfo
+//
+//      console.log(lastCard, dragDom.cardInfo);
+//      if(lastCard.horde!==dragDom.cardInfo.horde&&lastCard.index>dragDom.cardInfo.index){
+//        /*console.log(lastCard.horde, lastCard.index,'last');
+//        console.log(dragDom.cardInfo.horde,dragDom.cardInfo.index ,'now');*/
+//        var clone = dragDom.cloneNode(true)
+//        // clone不完善,不能完整复制dom中自定义属性
+//        clone.cardInfo = dragDom.cardInfo
+//        loader.appendChild(clone)
+//        dragDom.parentNode.removeChild(dragDom)
+//      }
+//    }
+//  }
+//
+//  function drag() {
+//    dragDom = null
+//    document.body.ondragstart = function(ev){
+//      UpIndex(tables, 100)
+//      var dom = ev.target
+//      var father = dom.parentNode
+//      var lastNode = father.children[father.children.length-1]
+//      if(lastNode === dom&&dom.getAttribute('class')==='card') {
+//        console.log(ev.target.cardInfo);
+//        dragDom = ev.target
+//      }
+//    };
+//  }
+
+  function UpIndex(wraps, num) {
+    for (var i = 0; i < wraps.length; i++) {
+      wraps[i].style.zIndex = num
+    }
+  }
+</script>
+</body>
+</html>

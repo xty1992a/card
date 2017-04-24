@@ -28,17 +28,36 @@
   w.init = function (wraps) {
     var chaosArr = getIndex()
     var bigArr = getArrs(chaosArr, 0, 7)
-    console.log(bigArr)
+    // console.log(bigArr)
     for (var i = 0; i < wraps.length; i++) {
       let fragment = document.createDocumentFragment()
-      var table = document.createElement('div')
+     /* var table = document.createElement('div')
           table.setAttribute('class', 'table')
-          // fragment.appendChild(table)
+          fragment.appendChild(table)
+          */
+
       for (var j = 0; j < bigArr[i].length; j++) {
+
         var card = document.createElement('div')
+        var url = urlList[bigArr[i][j]]
+        /*img/tao/tao_1.jpg*/
+        var reg = /\/(.*)\./
+          reg.test(url)
+        var info = RegExp.$1.split('/')[1].split('_')
+        var horde = 'black'
+        if (info[0]==='fang'||info[0]==='xin'){
+          horde = 'red'
+        }
+
+        card.cardInfo = {
+          color: info[0],
+          index: +info[1],
+          horde: horde
+        }
+        // console.log(card.cardInfo);
         card.setAttribute('class', 'card')
         card.setAttribute('draggable', 'true')
-        card.style.backgroundImage = 'url(' + urlList[bigArr[i][j]] + ')'
+        card.style.backgroundImage = 'url(' + url + ')'
         fragment.appendChild(card)
       }
       wraps[i].innerHTML = ''

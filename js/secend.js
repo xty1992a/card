@@ -1,0 +1,61 @@
+(function (w) {
+  function initList() {
+    var urlList = ["img/tao/tao_1.jpg", "img/tao/tao_2.jpg", "img/tao/tao_3.jpg", "img/tao/tao_4.jpg", "img/tao/tao_5.jpg", "img/tao/tao_6.jpg", "img/tao/tao_7.jpg", "img/tao/tao_8.jpg", "img/tao/tao_9.jpg", "img/tao/tao_10.jpg", "img/tao/tao_11.jpg", "img/tao/tao_12.jpg", "img/tao/tao_13.jpg", "img/hua/hua_1.jpg", "img/hua/hua_2.jpg", "img/hua/hua_3.jpg", "img/hua/hua_4.jpg", "img/hua/hua_5.jpg", "img/hua/hua_6.jpg", "img/hua/hua_7.jpg", "img/hua/hua_8.jpg", "img/hua/hua_9.jpg", "img/hua/hua_10.jpg", "img/hua/hua_11.jpg", "img/hua/hua_12.jpg", "img/hua/hua_13.jpg", "img/xin/xin_1.jpg", "img/xin/xin_2.jpg", "img/xin/xin_3.jpg", "img/xin/xin_4.jpg", "img/xin/xin_5.jpg", "img/xin/xin_6.jpg", "img/xin/xin_7.jpg", "img/xin/xin_8.jpg", "img/xin/xin_9.jpg", "img/xin/xin_10.jpg", "img/xin/xin_11.jpg", "img/xin/xin_12.jpg", "img/xin/xin_13.jpg", "img/fang/fang_1.jpg", "img/fang/fang_2.jpg", "img/fang/fang_3.jpg", "img/fang/fang_4.jpg", "img/fang/fang_5.jpg", "img/fang/fang_6.jpg", "img/fang/fang_7.jpg", "img/fang/fang_8.jpg", "img/fang/fang_9.jpg", "img/fang/fang_10.jpg", "img/fang/fang_11.jpg", "img/fang/fang_12.jpg", "img/fang/fang_13.jpg"]
+    // 用于获取一个打乱的数组的下标数组
+    function getIndex(arr) {
+      arr = typeof arr === 'undefined' ? [] : arr
+      function getNum(arr) {
+        var num = Math.round(Math.random() * 51)
+        return arr.indexOf(num) === -1 ? num : getNum(arr)
+      }
+      arr.push(getNum(arr))
+      return arr.length === 52 ? arr : getIndex(arr)
+    }
+      // 用于将上述数组拆分为8个小数组
+    function getArrs(list, start, end, result) {
+          result = typeof result === 'undefined' ? [] : result
+      var child = list.slice(start, end)
+          result.push(child)
+      var nextStart = end
+      var nextEnd = nextStart >= 28 ? nextStart + 6 : nextStart + 7
+      return nextStart >= list.length ? result : getArrs(list, nextStart, nextEnd, result)
+    }
+    var bigArr = getArrs(getIndex(),0,7)
+    // 双重替换,将子数组中的下标替换为相应url 最终返回一个包含了8个子数组的大数组,每个子数组包含7/6个url
+    return bigArr.map(smallArr => {
+      return smallArr.map(index => {
+        return urlList[index]
+      })
+    })
+  }
+
+  w.init = function (wrap) {
+    var list = initList()
+    wrap.innerHTML = ''
+    list.forEach(smallArr => {
+      var fragment = document.createDocumentFragment()
+      smallArr.forEach(url => {
+        var card = document.createElement('div')
+        var reg = /\/(.*)\./
+            reg.test(url)
+        //  获取正则子匹配(tao/tao_1),取得后半部分(tao_1),将其拆分为['tao',1]
+        var info = RegExp.$1.split('/')[1].split('_')
+        var horde = (info[0]==='fang'||info[0]==='xin') ? 'red': 'black'
+            card.cardInfo = {
+              color: info[0],
+              index: +info[1],
+              horde: horde
+            }
+            card.setAttribute('class', 'card')
+            card.setAttribute('draggable', 'true')
+            card.style.backgroundImage = 'url(' + url + ')'
+            fragment.appendChild(card)
+      })
+      var cardWrap = document.createElement('div')
+          cardWrap.setAttribute('class', 'card-wrap')
+          cardWrap.appendChild(fragment)
+          wrap.appendChild(cardWrap)
+    })
+  }
+})(window)
+

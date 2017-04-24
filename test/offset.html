@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="../css/reset.css">
+  <style>
+    .cell{
+      height: 500px;
+      width: 500px;
+      /*margin: 150px;*/
+      border: 1px solid;
+      position: relative;
+    }
+    .box{
+      height: 100px;
+      width: 100px;
+      background-color: yellowgreen;
+      position: absolute;
+      margin: 100px;
+    }
+  </style>
+</head>
+<body>
+
+
+<!--<div class="cell">-->
+  <div class="box"></div>
+<!--</div>-->
+<script type="text/javascript">
+  var cell = document.querySelector('.cell')
+  var box = document.querySelector('.box')
+  
+  document.onmousedown = function (ev) {
+    var offsetP = {
+      x: ev.offsetX,
+      y: ev.offsetY,
+      top: box.getBoundingClientRect().top,
+      left: box.getBoundingClientRect().left,
+    }
+    console.log(offsetP.top);
+    var startP = {
+      x: ev.clientX,
+      y: ev.clientY
+    }
+    document.onmousemove = function (ev) {
+      var currentP = {
+        x: ev.clientX,
+        y: ev.clientY
+      }
+//      box.style.top = currentP.y + 'px'
+//      box.style.left = currentP.x + 'px'
+//      box.style.top = currentP.y-offsetP.y + 'px'
+//      box.style.left = currentP.x-offsetP.x + 'px'
+      box.style.top = currentP.y-offsetP.y-offsetP.top + 'px'
+      box.style.left = currentP.x-offsetP.x-offsetP.left + 'px'
+    }
+    document.onmouseup = function () {
+      console.log(box.getBoundingClientRect().top);
+      document.onmouseup=document.onmousemove=null
+    }
+    console.log(ev);
+    
+    
+  }
+  document.onmouseover = function (ev) {
+      console.log('onmouseover ');
+  }
+
+</script>
+</body>
+</html>
